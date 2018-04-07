@@ -4,25 +4,24 @@
 
 namespace iiitb.education.project
 
-participant SampleParticipant identified by participantId {
-  o String participantId
-  o String firstName
-  o String lastName
+asset certificate identified by certificateId{
+  o String certificateId
+  -->Issuer issuer
+  -->Recipient recipient
 }
 
-asset SampleAsset identified by assetId {
-  o String assetId
-  --> SampleParticipant owner
-  o String value
+abstract participant User {
+  o String name
+  o String address
+  o String email
+  o String contact
 }
 
-transaction SampleTransaction {
-  --> SampleAsset asset
-  o String newValue
+participant Issuer identified by issuerId extends User{
+  o String issuerId
 }
 
-event SampleEvent {
-  --> SampleAsset asset
-  o String oldValue
-  o String newValue
+participant Recipient identified by recipientId extends User{
+  o String recipientId
 }
+
