@@ -4,10 +4,9 @@
 
 namespace iiitb.education.project
 
-asset certificate identified by certificateId{
+asset Certificate identified by certificateId{
   o String certificateId
   -->Issuer issuer
-  -->Recipient recipient
 }
 
 abstract participant User {
@@ -17,11 +16,20 @@ abstract participant User {
   o String contact
 }
 
+transaction issuertransaction {
+  o String transactionID
+  --> Certificate certificate
+   --> Issuer issuer
+  --> Recipient recipient
+}
+
 participant Issuer identified by issuerId extends User{
   o String issuerId
+  o Certificate[] issuedcert
 }
 
 participant Recipient identified by recipientId extends User{
   o String recipientId
+  o Certificate[] recievedcert
 }
 
