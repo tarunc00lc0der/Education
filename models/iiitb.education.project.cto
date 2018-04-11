@@ -4,32 +4,52 @@
 
 namespace iiitb.education.project
 
+
 asset Certificate identified by certificateId{
   o String certificateId
-  -->Issuer issuer
+  o String title
+  o String issuername
+  o String recipientname 
+  o DateTime  issuedate   optional 
+  --> Issuer issuer
+  --> Recipient recipient optional
 }
 
 abstract participant User {
   o String name
-  o String address
+  o String address optional
   o String email
   o String contact
 }
 
-transaction issuertransaction {
-  o String transactionID
-  --> Certificate certificate
-   --> Issuer issuer
-  --> Recipient recipient
-}
 
 participant Issuer identified by issuerId extends User{
   o String issuerId
-  o Certificate[] issuedcert
+  o walletcert[] issuedcert optional
+}
+
+concept walletcert{
+  o String certificateID
+  --> Issuer    issuer
+  --> Recipient recipient
+  o String certificatelink 
+  o String transactionID 
 }
 
 participant Recipient identified by recipientId extends User{
   o String recipientId
-  o Certificate[] recievedcert
+  o walletcert[] wcert optional 
 }
+
+
+transaction issuecertificate {
+  --> Certificate certificate
+  o String certificatelink
+  o String certificatehash
+  o walletcert  certfields optional
+  --> Issuer issuer
+  --> Recipient recipient
+}
+
+
 
