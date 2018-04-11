@@ -28,25 +28,24 @@ participant Issuer identified by issuerId extends User{
   o walletcert[] issuedcert optional
 }
 
-concept walletcert{
-  o String certificateID
-  --> Issuer    issuer
-  --> Recipient recipient
+concept walletcert {
+  o String certificateID optional
+  --> Issuer   issuer  optional
+  --> Recipient recipient optional
   o String certificatelink 
-  o String transactionID 
+  o String transactionID  optional
 }
 
 participant Recipient identified by recipientId extends User{
   o String recipientId
-  o walletcert[] wcert optional 
+  o walletcert[] wcert  optional 
 }
 
 
 transaction issuecertificate {
   --> Certificate certificate
-  o String certificatelink
   o String certificatehash
-  o walletcert  certfields optional
+  o walletcert  certfields 
   --> Issuer issuer
   --> Recipient recipient
 }
