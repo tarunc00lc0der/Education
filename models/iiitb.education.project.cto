@@ -3,13 +3,17 @@
  */
 
 namespace iiitb.education.project
+enum answer {
+  o FALSE
+  o TRUE }
 
 
 asset Certificate identified by certificateId{
   o String certificateId
   o String title
   o String issuername
-  o String recipientname 
+  o String recipientname
+  o answer issued optional
   o DateTime  issuedate   optional 
   --> Issuer issuer
   --> Recipient recipient optional
@@ -49,6 +53,16 @@ transaction issuecertificate {
   --> Issuer issuer
   --> Recipient recipient
 }
+
+transaction verifyCertificate {
+  o String transactionid
+  o String certificatehash 
+}
+
+event verify
+{ o answer verifytrue
+}
+
 
 
 
