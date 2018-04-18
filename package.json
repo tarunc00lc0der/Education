@@ -1,6 +1,6 @@
 {
-  "name": "credentialnetwork",
-  "version": "0.0.2",
+  "name": "educationnetwork",
+  "version": "0.0.1",
   "description": "a blockchain for verifcation",
   "scripts": {
     "prepublish": "mkdirp ./dist && composer archive create --sourceType dir --sourceName . -a ./dist/credential.bna",
