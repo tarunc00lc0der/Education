@@ -15,7 +15,7 @@
       ).then(
          res => console.log(res),
         err => console.error(err)
-      
+            
       );
     }
     
@@ -67,12 +67,64 @@
             // TODO: Handle errors
             var hash = md5.finalize();
             var hashHex = hash.toString(CryptoJS.enc.Hex);
-        document.getElementById("hash").value =hashHex;
+            document.getElementById("hash").value =hashHex;
             resolve(hashHex);
           }
         });
       });
     }
+    function WebSocketTest()
+      {
+         if ("WebSocket" in window)
+         {
+            var ws = new WebSocket("ws://52.140.97.39:3000");
+     
+            ws.onmessage = function (evt) 
+            { 
+                console.log(evt+"hi");
+              var data = JSON.parse(evt.data);
+               if(data.verifytrue == "FALSE")
+                 {
+                   alert("Your Certificate is not Genuine");
+                 }
+                 else
+                 {
+                   alert("The Certificate you entered is AUthenticated");
+                 }
+               //alert("HI");
+            };
+      
+            ws.onclose = function()
+            { 
+               // websocket is closed.
+               alert("Connection is closed..."); 
+            }
+         }
+      }
+      $(document).ready(function () {
+          $('#subbtn').click(function ()
+           {
+          var verify = { 
+  "$class": "iiitb.education.project.verifyCertificate",
+  "transactionid":  $('#transid1').val(),
+  "certificatehash":  $('#hash').val()
+         }
+
+
+          
+
+              console.log( "hello"+JSON.stringify( verify));
+              $.post("http://52.140.97.39:3000/api/verifyCertificate",
+                  verify,
+                  function (data, status) {
+                    
+
+                      console.log("Data: " + JSON.stringify(verify) + "\nStatus: " + status);
+                  });
+                  WebSocketTest();
+              
+          });
+      });
     </script>
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
       
@@ -99,10 +151,11 @@
 </div>
 <div style="padding-left:20px">
 <label ><h3>Transaction Id:</h3></label>
-<input type="text" placeholder="Transaction Id">
+<input type="text" id="transid1" placeholder="Transaction Id">
+<label><button type="button" id="sbmt" onclick="process()" >Submit Trans</label>
 </div>
 <div class="form-group "style="padding-left:30px">
-                <button type="submit" class="btn btn-primary  login-button" onClick="process()" value="Submit">Submit</button>
+                <button type="submit" class="btn btn-primary  login-button"  id="subbtn" value="Submit">Submit</button>
             </div>
 			</div>
 </body>
