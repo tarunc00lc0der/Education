@@ -1,8 +1,83 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <link rel="stylesheet" href="nav.css">
 <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
 <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<script>
+    function process() {
+      getMD5(
+        document.getElementById("my-file-input").files[0],
+        prog => console.log("Progress: " + prog)
+      ).then(
+         res => console.log(res),
+        err => console.error(err)
+      
+      );
+    }
+    
+    function readChunked(file, chunkCallback, endCallback) {
+      var fileSize   = file.size;
+      var chunkSize  = 4 * 1024 * 1024; // 4MB
+      var offset     = 0;
+      
+      var reader = new FileReader();
+      reader.onload = function() {
+        if (reader.error) {
+          endCallback(reader.error || {});
+          return;
+        }
+        offset += reader.result.length;
+        // callback for handling read chunk
+        // TODO: handle errors
+        chunkCallback(reader.result, offset, fileSize); 
+        if (offset >= fileSize) {
+          endCallback(null);
+          return;
+        }
+        readNext();
+      };
+    
+      reader.onerror = function(err) {
+        endCallback(err || {});
+      };
+    
+      function readNext() {
+        var fileSlice = file.slice(offset, offset + chunkSize);
+        reader.readAsBinaryString(fileSlice);
+      }
+      readNext();
+    }
+    
+    function getMD5(blob, cbProgress) {
+      return new Promise((resolve, reject) => {
+        var md5 = CryptoJS.algo.MD5.create();
+        readChunked(blob, (chunk, offs, total) => {
+          md5.update(CryptoJS.enc.Latin1.parse(chunk));
+          if (cbProgress) {
+            cbProgress(offs / total);
+          }
+        }, err => {
+          if (err) {
+            reject(err);
+          } else {
+            // TODO: Handle errors
+            var hash = md5.finalize();
+            var hashHex = hash.toString(CryptoJS.enc.Hex);
+        document.getElementById("hash").value =hashHex;
+            resolve(hashHex);
+          }
+        });
+      });
+    }
+    </script>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+      
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/md5.js"></script>
 </head>
 <body>
 
@@ -16,6 +91,8 @@
 <div>
 <label style="text-align: left"><h3>Please provide the required fields:</h3></label>
 </div>
+<div style="display:none">
+<input type="text" id="hash"></div>
 <div style="padding-left:20px">
 <label ><h3>Certificate:</h3></label>
 <label style="padding-left:55px"><input id="my-file-input" type="file"></label>
@@ -25,7 +102,7 @@
 <input type="text" placeholder="Transaction Id">
 </div>
 <div class="form-group "style="padding-left:30px">
-                <button type="submit" class="btn btn-primary  login-button" value="Submit">Submit</button>
+                <button type="submit" class="btn btn-primary  login-button" onClick="process()" value="Submit">Submit</button>
             </div>
 			</div>
 </body>

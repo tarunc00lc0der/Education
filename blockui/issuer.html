@@ -4,6 +4,98 @@
 <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
 <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
 <title></title>
+<meta charset="utf-8" />
+<title>Issuer Form</title>
+<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#createcert').click(function () {
+                var cert = {                  
+  "$class": "iiitb.education.project.Certificate",
+  "certificateId": $('#cerid1').val(),
+  "title": $('#title1').val(),
+  "issuername": $('#issnm1').val(),
+  "recipientname": $('#recnm1').val(),
+  "issued": "FALSE",
+  "issuer": "resource:iiitb.education.project.Issuer#"+$('#iss1').val()
+
+}
+
+
+                console.log( "hello"+JSON.stringify( cert));
+                $.post("http://52.140.97.39:3000/api/Certificate",
+                    cert,
+                    function (data, status) {
+                        console.log("Data: " + JSON.stringify(cert) + "\nStatus: " + status);
+                    });
+                
+            });
+        });
+    </script>
+
+
+<script>
+  $(document).ready(function () {
+      $('#issbtn').click(function () {
+      
+          var issue = {      
+  "$class": "iiitb.education.project.issuecertificate",
+  "certificate": "resource:iiitb.education.project.Certificate#"+$('#isscert1').val(),
+  "certificatehash": $('#isshs1').val(),
+  "certfields": {
+    "$class": "iiitb.education.project.walletcert",
+    "certificatelink": $('#issln1').val(),
+    "id": $('#issln1').val()
+  },
+  "issuer": "resource:iiitb.education.project.Issuer#"+$('#iss1').val(),
+  "recipient": "resource:iiitb.education.project.Recipient#"+$('#issrc1').val()
+}
+          console.log( "hello"+JSON.stringify( issue));
+          $.post("http://52.140.97.39:3000/api/issuecertificate",
+              issue,
+              function (data, status) {
+                  console.log("Data: " + JSON.stringify(issue) + "\nStatus: " + status);
+              });
+          
+      });
+  });
+</script>
+
+
+<script>
+  $(document).ready(function () {
+      $('#walbtn').click(function () {
+
+
+          var wallet1 = $('#iss1').val();
+          
+          $.get("http://52.140.97.39:3000/api/Issuer/" +wallet1,
+              function (data, status) {
+                console.log("Data: "+ wallet1);
+
+                  //$("#content").text(JSON.stringify(data));
+                     console.log(data);
+                  var r=data.issuedcert[0].recipient;
+                  var r1=r.split('#');
+                  console.log(r1[0]);
+                  $('#wcertid').val(data.issuedcert[0].certificateID) ;
+                  $('#wcertln').val(data.issuedcert[0].certificatelink) ;
+                  $('#wrc').val(r1[1]) ;
+                  $('#wtrans').val(data.issuedcert[0].transactionID) ;
+                  
+                  console.log("Data: " + r1[0] + status);
+
+
+                  //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+              });
+      });
+  });
+</script>
+
+
 
 <script>
 function process() {
@@ -86,10 +178,16 @@ function getMD5(blob, cbProgress) {
 	  document.getElementById('div10').style.display = 'none';
 	}
 	function show3(){
+	  document.getElementById('div10').style.display = 'none';
+	   document.getElementById('div2').style.display = 'none';
+	   document.getElementById('iss').style.display = 'none';
+	}
+  function show4(){
 	  document.getElementById('div10').style.display = 'block';
 	   document.getElementById('div2').style.display = 'none';
 	   document.getElementById('iss').style.display = 'none';
 	}
+
 	</script>
 	
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core.js"></script>
@@ -137,7 +235,7 @@ function destroyClickedElement(event)
 <div>
 <label style="text-align: left"><h3>Issuer Id:</h3></label>
 <label><input type="text" id="iss1" placeholder="Enter issuer id"></label>
-<label><button type="button" onclick="javascript:show3();" >Wallet</label>
+<label><button type="button" id="walbtn" onclick="javascript:show4();" >Wallet</label>
 <label><button type="button" onclick="javascript:show2();" >Create Cert</label>
 <label><button type="button" onclick="javascript:show1();" >Issue Cert</label>
 </div>
@@ -155,7 +253,7 @@ function destroyClickedElement(event)
 <div><label style="text-align: left"><h3>Recipient Name:</h3></label>
 <label ><input type="text" id="recnm1"placeholder="Enter Recipient name"></label>
 <div>
-<label><button type="button" onclick="javascript:show3();javascript:saveTextAsFile();" >CreateAndDownload</label>
+<label><button type="button" id="createcert" onclick="javascript:show3();javascript:saveTextAsFile();" >CreateAndDownload</label>
 </div></div>
 </div>
 
@@ -164,11 +262,20 @@ function destroyClickedElement(event)
 <label style="text-align: left"><h2>Wallet:</h2></label></div>
 <div style="padding-left:20px">
 <label ><h3>Certificate Id:</h3></label>
-<label style="padding-left:20px"><input type="text" placeholder="Certificate Id"></label>
-</div><div style="padding-left:20px">
-<label ><h3>Certificate Link:</h3></label>
-<label><input type="text" placeholder="Certificate Link"></label>
+<label style="padding-left:20px"><input type="text" id="wcertid"></label>
 </div>
+<div style="padding-left:20px">
+<label ><h3>Certificate Link:</h3></label>
+<label><input type="text" id="wcertln"></label>
+</div>
+<div style="padding-left:20px">
+  <label ><h3>Recipient Id:</h3></label>
+  <label><input type="text"id="wrc" ></label>
+  </div>
+<div style="padding-left:20px">
+    <label ><h3>Transaction Id:</h3></label>
+    <label><input type="text"id="wtrans" ></label>
+    </div>
 </div>
 
 <div id="iss" style="display:none; padding-left:30px;">
@@ -191,7 +298,7 @@ function destroyClickedElement(event)
 </div>
 <br>
 <div>
-<label style="padding-left:100px"style="padding-top:40px"><button type="button" >ClickToIssue</button></label>
+<label style="padding-left:100px"style="padding-top:40px"><button type="button"id="issbtn" >ClickToIssue</button></label>
 </div>
 </div>
 
