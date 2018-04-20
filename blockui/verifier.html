@@ -120,8 +120,17 @@
                     
 
                       console.log("Data: " + JSON.stringify(verify) + "\nStatus: " + status);
+                      if(status=="success") {WebSocketTest();}
+              }).fail(function(response){
+                // console.log(JSON.parse(JSON.stringify(response)));
+               var k = response.responseText;
+               console.log(k);
+                 if(k=="")  alert("Connection can't Be established");
+                 else{
+            
+                alert("transaction ID doesn't Exist");}
+
                   });
-                  WebSocketTest();
               
           });
       });
@@ -152,10 +161,10 @@
 <div style="padding-left:20px">
 <label ><h3>Transaction Id:</h3></label>
 <input type="text" id="transid1" placeholder="Transaction Id">
-<label><button type="button" id="sbmt" onclick="process()" >Submit Trans</label>
+<label><button type="button" id="sbmt" onclick="process()" >Submit</label>
 </div>
 <div class="form-group "style="padding-left:30px">
-                <button type="submit" class="btn btn-primary  login-button"  id="subbtn" value="Submit">Submit</button>
+                <button type="submit" class="btn btn-primary  login-button"  id="subbtn" value="Submit">VERIFY</button>
             </div>
 			</div>
 </body>

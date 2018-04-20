@@ -1,74 +1,107 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
+
 <head>
-<link rel="stylesheet" href="nav.css">
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-<meta charset="utf-8" />
-<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script>
-  $(document).ready(function () {
+  <link rel="stylesheet" href="nav.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  <script>
+    $(document).ready(function () {
       $('#recok').click(function () {
         console.log("hi");
 
-          var rec1 = $('#recid').val();
-          console.log(rec1);
-          
-          $.get("http://52.140.97.39:3000/api/Recipient/" +rec1,
-              function (data, status) {
-                console.log("Data: "+ rec1);
-                var r=data.wcert[0].issuer;
-                  var r1=r.split('#');
-                  console.log(r1[0]);
-                  //$("#content").text(JSON.stringify(data));
-                     console.log(data);
-                  $('#issId').val("Issuer"+r1[1]) ;
-                  $('#certid').val(data.wcert[0].certificateID) ;
-                  $('#certln').val(data.wcert[0].certificatelink) ;
-                  $('#transid').val(data.wcert[0].transactionID) ;
-                  
-                  console.log("Data: " + r1[0] + status);
+        var rec1 = $('#recid').val();
+        console.log(rec1);
+
+        $.get("http://52.140.97.39:3000/api/Recipient/" + rec1,
+          function (data, status) {
+
+            if(data.wcert.length!=0){
+            console.log("Data: " + rec1);
+            var r = data.wcert[0].issuer;
+            var r1 = r.split('#');
+            console.log(r1[0]);
+            //$("#content").text(JSON.stringify(data));
+            console.log(data);
+            $('#issId').val(r1[1]);
+            $('#certid').val(data.wcert[0].certificateID);
+            $('#certln').val(data.wcert[0].certificatelink);
+            $('#transid').val(data.wcert[0].transactionID);
+            }
+          else{
+            $('#issId').val("");
+            $('#certid').val("");
+            $('#certln').val("");
+            $('#transid').val("");
+          }
+            
 
 
-                  //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
-              });
+            //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+          });
       });
-  });
-</script>
+    });
+  </script>
 
 </head>
+
 <body>
 
-<ul>
-  <li><a href="issuer.html">Issuer</a></li>
-  <li><a class="active"  href="recipient.html">Recipient</a></li>
-  <li><a href="verifier.html">Verifier</a></li>
-  
-</ul>
-<div class="borders col-xs-9">
-<div>
-<label style="text-align: left"><h3>recipientId:</h3></label>
-<input type="text" id="recid">
-<label><button type="button"id="recok" >ok</label>
-</div>
-<div>
-<label style="text-align: left"><h2>Wallet:</h2></label>
-</div>
-<div style="padding-left:20px">
-<label ><h3>Issuer:</h3></label>
-<label style="padding-left:50px"><input type="text" id="issId"></label></div>
-<div style="padding-left:20px">
-<label ><h3>certificateId:</h3></label>
-<input type="text" id="certid"></div>
-<div style="padding-left:20px">
-<label ><h3>certificatelink:</h3></label>
-<input type="text" id="certln"></div>
-<div style="padding-left:20px">
-<label ><h3>transactionId:</h3></label>
-<input type="text" id="transid">
-</div>
-</div>
-</body>
-</html>
+  <ul>
+    <li>
+      <a href="issuer.html">Issuer</a>
+    </li>
+    <li>
+      <a class="active" href="recipient.html">Recipient</a>
+    </li>
+    <li>
+      <a href="verifier.html">Verifier</a>
+    </li>
 
-					
+  </ul>
+  <div class="borders col-xs-9">
+    <div>
+      <label style="text-align: left">
+        <h3>recipientId:</h3>
+      </label>
+      <input type="text" id="recid">
+      <label>
+        <button type="button" id="recok">ok</label>
+    </div>
+    <div>
+      <label style="text-align: left">
+        <h2>Wallet:</h2>
+      </label>
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>Issuer:</h3>
+      </label>
+      <label style="padding-left:50px">
+        <input type="text" id="issId">
+      </label>
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>certificateId:</h3>
+      </label>
+      <input type="text" id="certid">
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>certificatelink:</h3>
+      </label>
+      <input type="text" id="certln">
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>transactionId:</h3>
+      </label>
+      <input type="text" id="transid">
+    </div>
+  </div>
+</body>
+
+</html>

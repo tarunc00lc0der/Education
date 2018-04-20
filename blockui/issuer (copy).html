@@ -104,8 +104,7 @@
                 console.log("Data: "+ wallet1);
 
                   //$("#content").text(JSON.stringify(data));
-                     if(data.issuedcert.length!=0)
-                     {
+                     console.log(data);
                   var r=data.issuedcert[0].recipient;
                   var r1=r.split('#');
                   console.log(r1[0]);
@@ -113,14 +112,9 @@
                   $('#wcertln').val(data.issuedcert[0].certificatelink) ;
                   $('#wrc').val(r1[1]) ;
                   $('#wtrans').val(data.issuedcert[0].transactionID) ;
-                     }
-                     else{
-                      $('#wcertid').val("") ;
-                  $('#wcertln').val("") ;
-                  $('#wrc').val("") ;
-                  $('#wtrans').val("") ;
-                     }
                   
+                  console.log("Data: " + r1[0] + status);
+
 
                   //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
                  
