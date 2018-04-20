@@ -17,30 +17,43 @@
 
         $.get("http://52.140.97.39:3000/api/Recipient/" + rec1,
           function (data, status) {
-
-            if(data.wcert.length!=0){
-            console.log("Data: " + rec1);
-            var r = data.wcert[0].issuer;
-            var r1 = r.split('#');
-            console.log(r1[0]);
-            //$("#content").text(JSON.stringify(data));
-            console.log(data);
-            $('#issId').val(r1[1]);
-            $('#certid').val(data.wcert[0].certificateID);
-            $('#certln').val(data.wcert[0].certificatelink);
-            $('#transid').val(data.wcert[0].transactionID);
+            console.log(status);
+            if(rec1 != "")
+            {if (data.wcert.length != 0) {
+              console.log("Data: " + rec1);
+              var r = data.wcert[0].issuer;
+              var r1 = r.split('#');
+              console.log(r1[0]);
+              //$("#content").text(JSON.stringify(data));
+              console.log(data);
+              $('#issId').val(r1[1]);
+              $('#certid').val(data.wcert[0].certificateID);
+              $('#certln').val(data.wcert[0].certificatelink);
+              $('#transid').val(data.wcert[0].transactionID);
             }
-          else{
-            $('#issId').val("");
-            $('#certid').val("");
-            $('#certln').val("");
-            $('#transid').val("");
+            else {
+              $('#issId').val("");
+              $('#certid').val("");
+              $('#certln').val("");
+              $('#transid').val("");
+            }
           }
-            
+          else alert("Blank Field");
+
 
 
             //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+          }).fail(function (response) {
+            // console.log(JSON.parse(JSON.stringify(response)));
+            var k = response.responseText;
+            if (k == "") alert("Connection can't Be established");
+            else {
+              
+              alert("Recipient Doesn't Exist");
+            }
+
           });
+
       });
     });
   </script>

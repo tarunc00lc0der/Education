@@ -1,31 +1,32 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-<link rel="stylesheet" href="nav.css">
-<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
-<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
-<meta charset="utf-8" />
-<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
-<script>
+<head>
+  <link rel="stylesheet" href="nav.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+  <script>
     function process() {
       getMD5(
         document.getElementById("my-file-input").files[0],
         prog => console.log("Progress: " + prog)
       ).then(
-         res => console.log(res),
+        res => console.log(res),
         err => console.error(err)
-            
-      );
+
+        );
     }
-    
+
     function readChunked(file, chunkCallback, endCallback) {
-      var fileSize   = file.size;
-      var chunkSize  = 4 * 1024 * 1024; // 4MB
-      var offset     = 0;
-      
+      var fileSize = file.size;
+      var chunkSize = 4 * 1024 * 1024; // 4MB
+      var offset = 0;
+
       var reader = new FileReader();
-      reader.onload = function() {
+      reader.onload = function () {
         if (reader.error) {
           endCallback(reader.error || {});
           return;
@@ -33,25 +34,25 @@
         offset += reader.result.length;
         // callback for handling read chunk
         // TODO: handle errors
-        chunkCallback(reader.result, offset, fileSize); 
+        chunkCallback(reader.result, offset, fileSize);
         if (offset >= fileSize) {
           endCallback(null);
           return;
         }
         readNext();
       };
-    
-      reader.onerror = function(err) {
+
+      reader.onerror = function (err) {
         endCallback(err || {});
       };
-    
+
       function readNext() {
         var fileSlice = file.slice(offset, offset + chunkSize);
         reader.readAsBinaryString(fileSlice);
       }
       readNext();
     }
-    
+
     function getMD5(blob, cbProgress) {
       return new Promise((resolve, reject) => {
         var md5 = CryptoJS.algo.MD5.create();
@@ -67,107 +68,117 @@
             // TODO: Handle errors
             var hash = md5.finalize();
             var hashHex = hash.toString(CryptoJS.enc.Hex);
-            document.getElementById("hash").value =hashHex;
+            document.getElementById("hash").value = hashHex;
             resolve(hashHex);
           }
         });
       });
     }
-    function WebSocketTest()
-      {
-         if ("WebSocket" in window)
-         {
-            var ws = new WebSocket("ws://52.140.97.39:3000");
-     
-            ws.onmessage = function (evt) 
-            { 
-                console.log(evt+"hi");
-              var data = JSON.parse(evt.data);
-               if(data.verifytrue == "FALSE")
-                 {
-                   alert("Your Certificate is not Genuine");
-                 }
-                 else
-                 {
-                   alert("The Certificate you entered is AUthenticated");
-                 }
-               //alert("HI");
-            };
-      
-            ws.onclose = function()
-            { 
-               // websocket is closed.
-               alert("Connection is closed..."); 
-            }
-         }
+    function WebSocketTest() {
+      if ("WebSocket" in window) {
+        var ws = new WebSocket("ws://52.140.97.39:3000");
+
+        ws.onmessage = function (evt) {
+          console.log(evt + "hi");
+          var data = JSON.parse(evt.data);
+          if (data.verifytrue == "FALSE") {
+            alert("Your Certificate is not Genuine");
+          }
+          else {
+            alert("The Certificate you entered is AUthenticated");
+          }
+          //alert("HI");
+        };
+
+        ws.onclose = function () {
+          // websocket is closed.
+          alert("Connection is closed...");
+        }
       }
-      $(document).ready(function () {
-          $('#subbtn').click(function ()
-           {
-          var verify = { 
-  "$class": "iiitb.education.project.verifyCertificate",
-  "transactionid":  $('#transid1').val(),
-  "certificatehash":  $('#hash').val()
-         }
+    }
+    $(document).ready(function () {
+      $('#subbtn').click(function () {
+        var verify = {
+          "$class": "iiitb.education.project.verifyCertificate",
+          "transactionid": $('#transid1').val(),
+          "certificatehash": $('#hash').val()
+        }
 
 
-          
 
-              console.log( "hello"+JSON.stringify( verify));
-              $.post("http://52.140.97.39:3000/api/verifyCertificate",
-                  verify,
-                  function (data, status) {
-                    
 
-                      console.log("Data: " + JSON.stringify(verify) + "\nStatus: " + status);
-                      if(status=="success") {WebSocketTest();}
-              }).fail(function(response){
-                // console.log(JSON.parse(JSON.stringify(response)));
-               var k = response.responseText;
-               console.log(k);
-                 if(k=="")  alert("Connection can't Be established");
-                 else{
-            
-                alert("transaction ID doesn't Exist");}
+        console.log("hello" + JSON.stringify(verify));
+        $.post("http://52.140.97.39:3000/api/verifyCertificate",
+          verify,
+          function (data, status) {
 
-                  });
-              
+
+            console.log("Data: " + JSON.stringify(verify) + "\nStatus: " + status);
+            if (status == "success") { WebSocketTest(); }
+          }).fail(function (response) {
+            // console.log(JSON.parse(JSON.stringify(response)));
+            var k = response.responseText;
+            console.log(k);
+            if (k == "") alert("Connection can't Be established");
+            else {
+
+              alert("transaction ID doesn't Exist");
+            }
+
           });
+
       });
-    </script>
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-      
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/md5.js"></script>
+    });
+  </script>
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/md5.js"></script>
 </head>
+
 <body>
 
-<ul>
-  <li><a  href="issuer.html">Issuer</a></li>
-  <li><a href="recipient.html">Recipient</a></li>
-  <li><a class="active" href="verifier.html">Verifier</a></li>
-  
-</ul>
-<div class="borders col-xs-9">
-<div>
-<label style="text-align: left"><h3>Please provide the required fields:</h3></label>
-</div>
-<div style="display:none">
-<input type="text" id="hash"></div>
-<div style="padding-left:20px">
-<label ><h3>Certificate:</h3></label>
-<label style="padding-left:55px"><input id="my-file-input" type="file"></label>
-</div>
-<div style="padding-left:20px">
-<label ><h3>Transaction Id:</h3></label>
-<input type="text" id="transid1" placeholder="Transaction Id">
-<label><button type="button" id="sbmt" onclick="process()" >Submit</label>
-</div>
-<div class="form-group "style="padding-left:30px">
-                <button type="submit" class="btn btn-primary  login-button"  id="subbtn" value="Submit">VERIFY</button>
-            </div>
-			</div>
-</body>
-</html>
+  <ul>
+    <li>
+      <a href="issuer.html">Issuer</a>
+    </li>
+    <li>
+      <a href="recipient.html">Recipient</a>
+    </li>
+    <li>
+      <a class="active" href="verifier.html">Verifier</a>
+    </li>
 
-					
+  </ul>
+  <div class="borders col-xs-9">
+    <div>
+      <label style="text-align: left">
+        <h3>Please provide the required fields:</h3>
+      </label>
+    </div>
+    <div style="display:none">
+      <input type="text" id="hash">
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>Certificate:</h3>
+      </label>
+      <label style="padding-left:55px">
+        <input id="my-file-input" type="file">
+      </label>
+    </div>
+    <div style="padding-left:20px">
+      <label>
+        <h3>Transaction Id:</h3>
+      </label>
+      <input type="text" id="transid1" placeholder="Transaction Id">
+      <label>
+        <button type="button" id="sbmt" onclick="process()">Submit</label>
+    </div>
+    <div class="form-group " style="padding-left:30px">
+      <button type="submit" class="btn btn-primary  login-button" id="subbtn" value="Submit">VERIFY</button>
+    </div>
+  </div>
+</body>
+
+</html>
