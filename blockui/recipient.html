@@ -17,7 +17,7 @@
 
         $.get("http://52.140.97.39:3000/api/Recipient/" + rec1,
           function (data, status) {
-            console.log(status);
+            //console.log(status);
             if(rec1 != "")
             {if (data.wcert.length != 0) {
               console.log("Data: " + rec1);
@@ -44,8 +44,9 @@
 
             //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
           }).fail(function (response) {
-            // console.log(JSON.parse(JSON.stringify(response)));
-            var k = response.responseText;
+            //console.log(JSON.parse(JSON.stringify(response)));
+            var k = response.statusText;
+           // console.log(k);
             if (k == "") alert("Connection can't Be established");
             else {
               
