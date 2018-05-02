@@ -1,3 +1,4 @@
 # credential
 
-a blockchain for verifcation
+a blockchain for instant verification of certificates
+
