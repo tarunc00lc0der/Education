@@ -1,0 +1,343 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<link rel="stylesheet" href="nav.css">
+<script type="text/javascript" src="pop.js"></script>
+<link rel="stylesheet" href="bootstrap/css/bootstrap-theme.min.css">
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+<title></title>
+<meta charset="utf-8" />
+<title>Issuer Form</title>
+<meta name="viewport" content="initial-scale=1.0; maximum-scale=1.0; width=device-width;">
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#createcert').click(function () {
+                var cert = {                  
+  "$class": "iiitb.education.project.Certificate",
+  "certificateId": $('#cerid1').val(),
+  "title": $('#title1').val(),
+  "issuername": $('#issnm1').val(),
+  "recipientname": $('#recnm1').val(),
+  "issued": "FALSE",
+  "issuer": "resource:iiitb.education.project.Issuer#"+$('#iss1').val()
+
+}
+
+
+                console.log( "hello"+JSON.stringify( cert));
+                $.post("http://52.140.97.39:3000/api/Certificate",
+                    cert,
+                    function (data, status) {
+                        console.log("Data: " + JSON.stringify(cert) + "\nStatus: " + status);
+                        if(status=="success") {
+                        alert("Certificate Created successfully");
+                        saveTextAsFile();
+                        }
+              }).fail(function(response){
+                // console.log(JSON.parse(JSON.stringify(response)));
+               var k = response.responseText;
+                 if(k=="")  alert("Connection can't Be established");
+                 else{
+                   if(response.status==500)
+               {var r= k.split('Error:');
+               r= r[3].split('"');
+                alert(r[0]);}
+                else alert("fields can't be left blank");
+   
+                 }
+                    });
+                
+            });
+        });
+    </script>
+
+
+<script>
+  $(document).ready(function () {
+      $('#issbtn').click(function () {
+      
+          var issue = {      
+  "$class": "iiitb.education.project.issuecertificate",
+  "certificate": "resource:iiitb.education.project.Certificate#"+$('#isscert1').val(),
+  "certificatehash": $('#isshs1').val(),
+  "certfields": {
+    "$class": "iiitb.education.project.walletcert",
+    "certificatelink": $('#issln1').val(),
+    "id": $('#issln1').val()
+  },
+  "issuer": "resource:iiitb.education.project.Issuer#"+$('#iss1').val(),
+  "recipient": "resource:iiitb.education.project.Recipient#"+$('#issrc1').val()
+}
+          console.log( "hello"+JSON.stringify( issue));
+          $.post("http://52.140.97.39:3000/api/issuecertificate",
+              issue,
+              function (data, status) {
+                  console.log("Data: " + JSON.stringify(issue) + "\nStatus: " + status);
+                  if(status=="success") myFunction();
+              }).fail(function(response){
+                // console.log(JSON.parse(JSON.stringify(response)));
+               var k = response.responseText;
+                 if(k=="")  alert("Connection can't Be established");
+                 else{
+               var r= k.split('Error:');
+               r= r[3].split('"');
+                alert(r[0]);}
+
+              });
+          
+      });
+  });
+</script>
+
+
+<script>
+  $(document).ready(function () {
+      $('#walbtn').click(function () {
+
+
+          var wallet1 = $('#iss1').val();
+          
+          $.get("http://52.140.97.39:3000/api/Issuer/" +wallet1,
+              function (data, status) {
+                console.log("Data: "+ wallet1);
+
+                  //$("#content").text(JSON.stringify(data));
+                     console.log(data);
+                  var r=data.issuedcert[0].recipient;
+                  var r1=r.split('#');
+                  console.log(r1[0]);
+                  $('#wcertid').val(data.issuedcert[0].certificateID) ;
+                  $('#wcertln').val(data.issuedcert[0].certificatelink) ;
+                  $('#wrc').val(r1[1]) ;
+                  $('#wtrans').val(data.issuedcert[0].transactionID) ;
+                  
+                  console.log("Data: " + r1[0] + status);
+
+
+                  //alert("Data: " + JSON.stringify(data) + "\nStatus: " + status);
+                 
+              }).fail(function(response){
+                // console.log(JSON.parse(JSON.stringify(response)));
+               var k = response.responseText;
+               console.log(k);
+                 if(k=="")  alert("Connection can't Be established");
+                 else{
+                alert("Issuer Doesn't Exist");}
+
+              });
+      });
+  });
+</script>
+
+
+
+<script>
+function process() {
+  getMD5(
+    document.getElementById("my-file-input").files[0],
+    prog => console.log("Progress: " + prog)
+  ).then(
+     res => console.log(res),
+    err => console.error(err)
+  
+  );
+}
+
+function readChunked(file, chunkCallback, endCallback) {
+  var fileSize   = file.size;
+  var chunkSize  = 4 * 1024 * 1024; // 4MB
+  var offset     = 0;
+  
+  var reader = new FileReader();
+  reader.onload = function() {
+    if (reader.error) {
+      endCallback(reader.error || {});
+      return;
+    }
+    offset += reader.result.length;
+    // callback for handling read chunk
+    // TODO: handle errors
+    chunkCallback(reader.result, offset, fileSize); 
+    if (offset >= fileSize) {
+      endCallback(null);
+      return;
+    }
+    readNext();
+  };
+
+  reader.onerror = function(err) {
+    endCallback(err || {});
+  };
+
+  function readNext() {
+    var fileSlice = file.slice(offset, offset + chunkSize);
+    reader.readAsBinaryString(fileSlice);
+  }
+  readNext();
+}
+
+function getMD5(blob, cbProgress) {
+  return new Promise((resolve, reject) => {
+    var md5 = CryptoJS.algo.MD5.create();
+    readChunked(blob, (chunk, offs, total) => {
+      md5.update(CryptoJS.enc.Latin1.parse(chunk));
+      if (cbProgress) {
+        cbProgress(offs / total);
+      }
+    }, err => {
+      if (err) {
+        reject(err);
+      } else {
+        // TODO: Handle errors
+        var hash = md5.finalize();
+        var hashHex = hash.toString(CryptoJS.enc.Hex);
+		document.getElementById("isshs1").value =hashHex;
+        resolve(hashHex);
+      }
+    });
+  });
+}
+</script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+	<script>
+	function show2(){
+	  document.getElementById('div2').style.display = 'block';
+	  document.getElementById('iss').style.display = 'none';
+	  document.getElementById('div10').style.display = 'none';
+	}
+	function show1(){
+	  document.getElementById('iss').style.display = 'block';
+	  document.getElementById('div2').style.display = 'none';
+	  document.getElementById('div10').style.display = 'none';
+	}
+	function show3(){
+	  document.getElementById('div10').style.display = 'none';
+	   document.getElementById('div2').style.display = 'none';
+	   document.getElementById('iss').style.display = 'none';
+	}
+  function show4(){
+	  document.getElementById('div10').style.display = 'block';
+	   document.getElementById('div2').style.display = 'none';
+	   document.getElementById('iss').style.display = 'none';
+	}
+
+	</script>
+	
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/core.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/components/md5.js"></script>
+<script>
+function saveTextAsFile()
+{
+    var IS1= "ISSUER ID: "+document.getElementById("iss1").value;
+	var Cert1= " CERTIFICATE ID:"+document.getElementById("cerid1").value;
+	var T1= "  TITLE: "+document.getElementById("title1").value;
+	var isnm1= "  ISSUER NAME: "+document.getElementById("issnm1").value;
+	var rc1= "  RECIPIENT NAME: "+document.getElementById("recnm1").value;
+	
+	 var textToSave= IS1+""+Cert1+T1+isnm1+rc1;
+    var textToSaveAsBlob = new Blob([textToSave], {type:"text/plain"});
+    var textToSaveAsURL = window.URL.createObjectURL(textToSaveAsBlob);
+    var fileNameToSaveAs = document.getElementById("cerid1").value;
+ 
+    var downloadLink = document.createElement("a");
+    downloadLink.download = fileNameToSaveAs;
+    downloadLink.innerHTML = "Download File";
+    downloadLink.href = textToSaveAsURL;
+    downloadLink.onclick = destroyClickedElement;
+    downloadLink.style.display = "none";
+    document.body.appendChild(downloadLink);
+ 
+    downloadLink.click();
+}
+ 
+function destroyClickedElement(event)
+{
+    document.body.removeChild(event.target);
+}
+</script>
+</head>
+<body>
+
+<ul>
+  <li><a class="active" href="issuer.html">Issuer</a></li>
+  <li><a href="recipient.html">Recipient</a></li>
+  <li><a href="verifier.html">Verifier</a></li>
+  
+</ul>
+<div class="borders col-xs-9">
+<div>
+<label style="text-align: left"><h3>Issuer Id:</h3></label>
+<label><input type="text" id="iss1" placeholder="Enter issuer id"></label>
+<label><button type="button" id="walbtn" onclick="javascript:show4();" >Wallet</label>
+<label><button type="button" onclick="javascript:show2();" >Create Cert</label>
+<label><button type="button" onclick="javascript:show1();" >Issue Cert</label>
+</div>
+<div id="div2" class="col-sm-11"style="display: none">
+<div >
+<label style="text-align: left"><h3>Certificate Id:</h3></label>
+<label style="padding-left:35px"><input type="text" id="cerid1"placeholder="Enter cert id" ><label>
+</div>
+<div><label style="text-align: left"><h3>Title:</h3></label>
+<label style="padding-left:125px"><input type="text" id="title1"placeholder="Enter cert title" ></label>
+</div>
+<div><label style="text-align: left"><h3>Issuer Name:</h3></label>
+<label style="padding-left:35px"><input type="text" id="issnm1"placeholder="Enter issuer name"></label>
+</div>
+<div><label style="text-align: left"><h3>Recipient Name:</h3></label>
+<label ><input type="text" id="recnm1"placeholder="Enter Recipient name"></label>
+<div>
+<label><button type="button" id="createcert" onclick="javascript:show3();" >CreateAndDownload</label>
+</div></div>
+</div>
+
+<div id="div10" style="display:none">
+<div>
+<label style="text-align: left"><h2>Wallet:</h2></label></div>
+<div style="padding-left:20px">
+<label ><h3>Certificate Id:</h3></label>
+<label style="padding-left:20px"><input type="text" id="wcertid"></label>
+</div>
+<div style="padding-left:20px">
+<label ><h3>Certificate Link:</h3></label>
+<label><input type="text" id="wcertln"></label>
+</div>
+<div style="padding-left:20px">
+  <label ><h3>Recipient Id:</h3></label>
+  <label><input type="text"id="wrc" ></label>
+  </div>
+<div style="padding-left:20px">
+    <label ><h3>Transaction Id:</h3></label>
+    <label><input type="text"id="wtrans" ></label>
+    </div>
+</div>
+<div id="snackbar">Issued the Certificate</div>
+<div id="iss" style="display:none; padding-left:30px;">
+<div>
+<label style="text-align: left"><h3>Cert id:</h3></label>
+<label style="padding-left:50px"><input type="text" id="isscert1"></label></div>
+<div><label style="text-align: left"><h3>Cert Link:</h3></label>
+<label style="padding-left:30px"><input type="text" id="issln1"></label>
+</div>
+<div><label style="text-align: left"><h3>Cert Hash:</h3></label>
+<label style="padding-left:25px"><input type="text" id="isshs1"></label>
+</div>
+<div><label style="text-align: left"><h3>Recipient Id:</h3></label>
+<label ><input type="text" id="issrc1"></label>
+</div>
+<br>
+<div>
+<input id="my-file-input" type="file">
+<button onclick="process()">CreateHash</button>
+</div>
+<br>
+<div>
+<label style="padding-left:100px"style="padding-top:40px"><button type="button"id="issbtn" >ClickToIssue</button></label>
+</div>
+</div>
+
+</div>
+</body>
+</html>

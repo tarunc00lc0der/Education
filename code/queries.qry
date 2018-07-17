@@ -1,0 +1,10 @@
+/**
+ * New query file
+ */
+query getTransactionbyId {
+    description: "Select given transaction with given id"
+    statement:
+    SELECT  iiitb.education.project.issuecertificate
+    WHERE (transactionId == _$transactionid)     
+}
+
